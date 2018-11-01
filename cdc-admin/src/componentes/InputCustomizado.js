@@ -6,6 +6,7 @@ export default class InputCustomizado extends Component {
     constructor() {
         super();
         this.state = { msgErro: '' };
+        console.log("contrutor");
     }
 
     render() {
@@ -21,7 +22,7 @@ export default class InputCustomizado extends Component {
 
     componentWillMount(){
         PubSub.subscribe("erro-validacao",(topico,erro)=>{
-            if(erro.field == this.props.name){
+            if(erro.field === this.props.name){
                 this.setState({msgErro:erro.defaultMessage});
             }
         });
