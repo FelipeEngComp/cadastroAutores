@@ -6,7 +6,6 @@ export default class InputCustomizado extends Component {
     constructor() {
         super();
         this.state = { msgErro: '' };
-        console.log("contrutor");
     }
 
     render() {

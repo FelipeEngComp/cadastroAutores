@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import $ from 'jquery';
+import axios from 'axios';
 import InputCustomizado from './componentes/InputCustomizado';
 import PubSub from 'pubsub-js';
 import TratadorErros from './TratadorErros';
@@ -12,27 +12,26 @@ class FormularioAutor extends Component {
         this.enviaForm = this.enviaForm.bind(this);
     }
 
+
     enviaForm(evento) {
         evento.preventDefault();
-        $.ajax({
+        axios({
             url: 'https://cdc-react.herokuapp.com/api/autores',
+            method: 'post',
             contentType: 'application/json',
             dataType: 'json',
-            type: 'post',
             data: JSON.stringify({ nome: this.state.nome, email: this.state.email, senha: this.state.senha }),
-            success: function (novaListagem) {
-                PubSub.publish('atualiza-lista-autores', novaListagem);
-                this.setState({ nome: '', email: '', senha: '' });
-            }.bind(this),
-            error: function (resposta) {
-                if (resposta.status === 400) {
-                    new TratadorErros().publicaErros(resposta.responseJSON);
-                }
-            },
-            beforeSend: function () {
-                PubSub.publish("limpa-erros", {});
+        })
+        .then( (novaListagem)=>{
+            PubSub.publish('atualiza-lista-autores', novaListagem);
+            this.setState({ nome: '', email: '', senha: '' });
+            console.log("sucesso");
+        })
+        .catch((resposta)=>{
+            if (resposta.status === 400) {
+                new TratadorErros().publicaErros(resposta.responseJSON);
             }
-        });
+        })
     }
 
     salvaAlteracao(nomeInput, evento) {
@@ -98,14 +97,17 @@ export default class AutorBox extends Component {
     }
 
     componentDidMount() {
-        $.ajax({
+        axios({
             url: "https://cdc-react.herokuapp.com/api/autores",
-            dataType: 'json',
-            success: function (resposta) {
-                this.setState({ lista: resposta });
-            }.bind(this)
-        }
-        );
+            dataType: 'json'
+        })
+        .then((resposta)=>{
+            this.setState({lista : resposta});  
+            console.log("feito");
+        })
+        .catch(()=>{
+            alert('Erro ao carregar autores');
+        })
 
         PubSub.subscribe('atualiza-lista-autores', function (topico, novaLista) {
             this.setState({ lista: novaLista });
@@ -121,6 +123,7 @@ export default class AutorBox extends Component {
                 </div>
                 <div className="content" id="content">
                     <FormularioAutor />
+                    
                     <TabelaAutores lista={this.state.lista} />
                 </div>
 
