@@ -16,14 +16,14 @@ class FormularioAutor extends Component {
     enviaForm(evento) {
         evento.preventDefault();
         axios({
-            url: 'https://cdc-react.herokuapp.com/api/autores',
+            url: 'http://cdc-react.herokuapp.com/api/autores',
             method: 'post',
-            contentType: 'application/json',
-            dataType: 'json',
+            // contentType: 'application/json',
+            // dataType: 'json',
             data: JSON.stringify({ nome: this.state.nome, email: this.state.email, senha: this.state.senha }),
+            headers:{'Content-Type': 'application/json; charset=utf-8'}
         })
         .then( (novaListagem)=>{
-            PubSub.publish('atualiza-lista-autores', novaListagem);
             this.setState({ nome: '', email: '', senha: '' });
             console.log("sucesso");
         })
@@ -73,7 +73,7 @@ class TabelaAutores extends Component {
                     </thead>
                     <tbody>
                         {
-                            this.props.lista.map(function (autor) {
+                            this.props.lista.map((autor)=> {
                                 return (
                                     <tr key={autor.id}>
                                         <td>{autor.nome}</td>
@@ -98,8 +98,8 @@ export default class AutorBox extends Component {
 
     componentDidMount() {
         axios({
-            url: "https://cdc-react.herokuapp.com/api/autores",
-            dataType: 'json'
+            url: "http://cdc-react.herokuapp.com/api/autores",
+            headers:{'Content-Type': 'application/json; charset=utf-8'}  
         })
         .then((resposta)=>{
             this.setState({lista : resposta});  
@@ -108,10 +108,10 @@ export default class AutorBox extends Component {
         .catch(()=>{
             alert('Erro ao carregar autores');
         })
-
-        PubSub.subscribe('atualiza-lista-autores', function (topico, novaLista) {
-            this.setState({ lista: novaLista });
-        }.bind(this));
+        console.log(this.state.lista);
+        // PubSub.subscribe('atualiza-lista-autores', function (topico, novaLista) {
+        //     this.setState({ lista: novaLista });
+        // }.bind(this));
     }
 
 
