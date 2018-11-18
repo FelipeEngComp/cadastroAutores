@@ -4,25 +4,25 @@ import InputCustomizado from './componentes/InputCustomizado';
 import PubSub from 'pubsub-js';
 import TratadorErros from './TratadorErros';
 
-class FormularioAutor extends Component {
+class FormularioCandidato extends Component {
 
     constructor() {
         super();
-        this.state = { nome: '', email: '', senha: '' };
+        this.state = { nome: '', email: '', gitHub: '', linkedin: '' };
         this.enviaForm = this.enviaForm.bind(this);
     }
 
     enviaForm(evento) {
         evento.preventDefault();
         $.ajax({
-            url: 'https://cdc-react.herokuapp.com/api/autores',
+            url: '',
             contentType: 'application/json',
             dataType: 'json',
             type: 'post',
             data: JSON.stringify({ nome: this.state.nome, email: this.state.email, senha: this.state.senha }),
             success: function (novaListagem) {
                 PubSub.publish('atualiza-lista-autores', novaListagem);
-                this.setState({ nome: '', email: '', senha: '' });
+                this.setState({ nome: '', email: '', gitHub: '' , linkedin:''});
             }.bind(this),
             error: function (resposta) {
                 if (resposta.status === 400) {
@@ -47,20 +47,20 @@ class FormularioAutor extends Component {
                 <form className="pure-form pure-form-aligned" onSubmit={this.enviaForm} method="post">
                     <InputCustomizado id="nome" type="text" name="nome" value={this.state.nome} onChange={this.salvaAlteracao.bind(this,'nome')} label="Nome" />
                     <InputCustomizado id="email" type="email" name="email" value={this.state.email} onChange={this.salvaAlteracao.bind(this,'email')} label="Email" />
-                    <InputCustomizado id="senha" type="password" name="senha" value={this.state.senha} onChange={this.salvaAlteracao.bind(this,'senha')} label="Senha" />
+                    <InputCustomizado id="gitHub" type="text" name="gitHub" value={this.state.gitHub} onChange={this.salvaAlteracao.bind(this,'gitHub')} label="GitHub" />
+                    <InputCustomizado id="linkedin" type="text" name="linkedin" value={this.state.linkedin} onChange={this.salvaAlteracao.bind(this,'linkedin')} label="Linkedin" />
                     <div className="pure-control-group">
                         <label></label>
                         <button type="submit" className="pure-button pure-button-primary">Gravar</button>
                     </div>
                 </form>
-
             </div>
 
         );
     }
 }
 
-class TabelaAutores extends Component {
+class TabelaCandidato extends Component {
 
     render() {
         return (
@@ -70,15 +70,19 @@ class TabelaAutores extends Component {
                         <tr>
                             <th>Nome</th>
                             <th>email</th>
+                            <th>GitHub</th>
+                            <th>Linkedin</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
-                            this.props.lista.map(function (autor) {
+                            this.props.lista.map(function (candidato) {
                                 return (
-                                    <tr key={autor.id}>
-                                        <td>{autor.nome}</td>
-                                        <td>{autor.email}</td>
+                                    <tr key={candidato.id}>
+                                        <td>{candidato.nome}</td>
+                                        <td>{candidato.email}</td>
+                                        <td>{candidato.gitHub}</td>
+                                        <td>{candidato.linkedin}</td>
                                     </tr>
                                 );
                             })
@@ -90,7 +94,7 @@ class TabelaAutores extends Component {
     }
 }
 
-export default class AutorBox extends Component {
+export default class CandidatoBox extends Component {
 
     constructor() {
         super();
@@ -99,7 +103,7 @@ export default class AutorBox extends Component {
 
     componentDidMount() {
         $.ajax({
-            url: "https://cdc-react.herokuapp.com/api/autores",
+            url: "",
             dataType: 'json',
             success: function (resposta) {
                 this.setState({ lista: resposta });
@@ -117,13 +121,12 @@ export default class AutorBox extends Component {
         return (
             <div>
                 <div className="header">
-                    <h1>Cadastro de autores</h1>
+                    <h1>Cadastro de Candidatos</h1>
                 </div>
                 <div className="content" id="content">
-                    <FormularioAutor />
-                    <TabelaAutores lista={this.state.lista} />
+                    <FormularioCandidato />
+                    <TabelaCandidato lista={this.state.lista} />
                 </div>
-
             </div>
         );
     }
